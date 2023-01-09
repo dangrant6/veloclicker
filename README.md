@@ -1,6 +1,8 @@
 # veloclicker
 
-A new Flutter project.
+cookie clicker but velo    
+(inside joke)    
+get your velo up
 
 ## Getting Started
 
