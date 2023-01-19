@@ -7,3 +7,6 @@ const double kUpgrade1Multiplier = 2;
 const double kUpgrade2Multiplier = 5;
 const double kUpgrade3Multiplier = 10;
 const double kUpgrade4Multiplier = 50;
+
+const int kInsanePrice = 1000000;
+const double kInsaneMultiplier = 1000000;

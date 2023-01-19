@@ -1,7 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bouncing_widget/bouncing_widget.dart';
+import 'package:veloclicker/shop.dart';
 import 'constants.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+num veloNums = 0;
+num multiplier = 1;
 
 class VeloPage extends StatefulWidget {
   @override
@@ -9,15 +15,12 @@ class VeloPage extends StatefulWidget {
 }
 
 class _VeloPageState extends State<VeloPage> {
-  num veloNums = 0;
-  num multiplier = 1;
 
   @override
   Widget build(BuildContext context) {
-    resizeToAvoidBottomPadding: false;
+    resizeToAvoidBottomPadding: true;
     bool isEnabled = false;
-    return Expanded(
-      child: Column(
+    return Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
@@ -36,6 +39,16 @@ class _VeloPageState extends State<VeloPage> {
                 fontSize: 20,
               ),
               textAlign: TextAlign.center,
+            ),
+          ),
+          Material(
+          child: Padding(padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+          child: IconButton(
+            icon: Icon(Icons.shopify_outlined,
+              color: Colors.deepOrange,
+              size: 30,
+            ), onPressed: () async{ Navigator.push(context, MaterialPageRoute(builder: (context) => ShopPage())); },
+              ),
             ),
           ),
           Row(
@@ -163,7 +176,7 @@ class _VeloPageState extends State<VeloPage> {
             padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 30.0),
             child: BouncingWidget(
               duration: Duration(milliseconds: 100),
-              scaleFactor: 1.3,
+              scaleFactor: 2.0,
               onPressed: () {
                 setState(() {
                   veloNums += multiplier;
@@ -176,14 +189,13 @@ class _VeloPageState extends State<VeloPage> {
             ),
           ),
         ],
-      ),
     );
   }
 }
 
 showAlertDialog(BuildContext context) {
   // set up the button
-  Widget okButton = FlatButton(
+  Widget okButton = OutlinedButton(
     child: Text("OK"),
     onPressed: () {
       Navigator.of(context).pop();
@@ -206,4 +218,8 @@ showAlertDialog(BuildContext context) {
       return alert;
     },
   );
+}
+
+save() async{
+  final prefs = await SharedPreferences.getInstance();
 }
