@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:flutter/rendering.dart';
 import 'clicker.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget {

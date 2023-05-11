@@ -5,27 +5,50 @@ import 'package:veloclicker/shop.dart';
 import 'constants.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'db.dart';
 
 num veloNums = 0;
 num multiplier = 1;
+final dbHelper = DatabaseHelper();
 
 class VeloPage extends StatefulWidget {
+  const VeloPage({Key? key}) : super(key: key);
+
   @override
   _VeloPageState createState() => _VeloPageState();
 }
 
 class _VeloPageState extends State<VeloPage> {
+  @override
+  void initState() {
+    super.initState();
+    _loadGameState();
+  }
+
+  void _loadGameState() async {
+    final gameState = await dbHelper.loadGameState();
+    setState(() {
+      veloNums = gameState['veloNums'];
+      multiplier = gameState['multiplier'];
+    });
+  }
+
+  void _saveGameState() async {
+    final gameState = {'veloNums': veloNums, 'multiplier': multiplier};
+    await dbHelper.updateGameState(gameState);
+  }
 
   @override
   Widget build(BuildContext context) {
     resizeToAvoidBottomPadding: true;
     bool isEnabled = false;
-    return Column(
+    return SingleChildScrollView(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            'Velo: ' + num.parse(veloNums.toStringAsFixed(4)).toString(),
-            style: TextStyle(
+            'Velo: ${veloNums.toInt()}',
+            style: const TextStyle(
               fontSize: 35,
             ),
             textAlign: TextAlign.center,
@@ -33,24 +56,41 @@ class _VeloPageState extends State<VeloPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 80.0),
             child: Text(
-              'Multiplier: ' +
-                  num.parse(multiplier.toStringAsFixed(2)).toString(),
-              style: TextStyle(
+              'Multiplier: ${multiplier.toInt()}',
+              style: const TextStyle(
                 fontSize: 20,
               ),
               textAlign: TextAlign.center,
             ),
           ),
+          Column(
+            children: [
+              const Text(
+                'Shop',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  decoration: null,
+                ),
+              ),
           Material(
-          child: Padding(padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
-          child: IconButton(
-            icon: Icon(Icons.shopify_outlined,
-              color: Colors.deepOrange,
-              size: 30,
-            ), onPressed: () async{ Navigator.push(context, MaterialPageRoute(builder: (context) => ShopPage())); },
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.shopify_outlined,
+                  color: Colors.deepOrange,
+                  size: 30,
+                ),
+                onPressed: () async {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ShopPage()));
+                },
               ),
             ),
           ),
+        ],
+    ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -58,14 +98,14 @@ class _VeloPageState extends State<VeloPage> {
                 padding:
                 const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.red, // background
-                    onPrimary: Colors.yellow,),
-
+                  style: ElevatedButton.styleFrom(foregroundColor: Colors.yellow, backgroundColor: Colors.red,),
                   onPressed: () {
                     if (veloNums >= kUpgrade1Price) {
                       setState(() {
                         veloNums -= kUpgrade1Price;
-                        multiplier = kUpgrade1Multiplier;
+                        multiplier *= kUpgrade1Multiplier;
+                        _saveGameState();
+                        // multiplier = kUpgrade1Multiplier;
                       });
                     } else {
                       showAlertDialog(context);
@@ -78,13 +118,14 @@ class _VeloPageState extends State<VeloPage> {
                 padding:
                 const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.red, // background
-                    onPrimary: Colors.yellow,),
+                  style: ElevatedButton.styleFrom(foregroundColor: Colors.yellow, backgroundColor: Colors.red,),
                   onPressed: () {
                     if (veloNums >= kUpgrade2Price) {
                       setState(() {
                         veloNums -= kUpgrade2Price;
-                        multiplier = kUpgrade2Multiplier;
+                        multiplier *= kUpgrade2Multiplier;
+                        _saveGameState();
+                        //multiplier = kUpgrade2Multiplier;
                       });
                     } else {
                       showAlertDialog(context);
@@ -103,7 +144,9 @@ class _VeloPageState extends State<VeloPage> {
                     if (veloNums >= kUpgrade3Price) {
                       setState(() {
                         veloNums -= kUpgrade3Price;
-                        multiplier = kUpgrade3Multiplier;
+                        multiplier *= kUpgrade3Multiplier;
+                        _saveGameState();
+                        // multiplier = kUpgrade3Multiplier;
                       });
                     } else {
                       showAlertDialog(context);
@@ -116,43 +159,44 @@ class _VeloPageState extends State<VeloPage> {
                 padding:
                 const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.red, // background
-    onPrimary: Colors.yellow,),
+                  style: ElevatedButton.styleFrom(foregroundColor: Colors.yellow, backgroundColor: Colors.red,),
                   onPressed: () {
                     if (veloNums >= kUpgrade4Price) {
                       setState(() {
                         veloNums -= kUpgrade4Price;
-                        multiplier = kUpgrade4Multiplier;
+                        multiplier *= kUpgrade4Multiplier;
+                        _saveGameState();
+                        // multiplier = kUpgrade4Multiplier;
                       });
                     } else {
                       showAlertDialog(context);
                     }
                   },
-                  child: Text('$kUpgrade4Multiplier' + 'x'),
+                  child: const Text('$kUpgrade4Multiplier' + 'x'),
                 ),
               ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: const [
               Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+                EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                 child: Text('$kUpgrade1Price' + ' Velo',
                     style: TextStyle(fontSize: 15, color: Colors.orange),
                 ),
               ),
               Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+                EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                 child: Text('$kUpgrade2Price' + ' Velo',
                   style: TextStyle(fontSize: 15, color: Colors.orange),
                 ),
               ),
               Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+                EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                 child: Text(
                     '$kUpgrade3Price' + ' Velo',
                     style: TextStyle(fontSize: 15,
@@ -162,7 +206,7 @@ class _VeloPageState extends State<VeloPage> {
               ),
               Padding(
                 padding:
-                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+                EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                 child: Text(
                   '$kUpgrade4Price' + ' Velo',
                   style: TextStyle(fontSize: 15,
@@ -180,6 +224,7 @@ class _VeloPageState extends State<VeloPage> {
               onPressed: () {
                 setState(() {
                   veloNums += multiplier;
+                  _saveGameState();
                 });
               },
               child: Image.asset(
@@ -189,6 +234,7 @@ class _VeloPageState extends State<VeloPage> {
             ),
           ),
         ],
+      ),
     );
   }
 }
